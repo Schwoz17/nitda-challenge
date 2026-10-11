@@ -1,0 +1,24 @@
+{
+  "llm": {
+    "model": "NCAIR1/N-ATLaS",
+    "revision": "e294476928aca9030e924ca27bb8e085e8581273"
+  },
+  "asr": {
+    "ha": {
+      "model": "",
+      "revision": ""
+    },
+    "ig": {
+      "model": "",
+      "revision": ""
+    },
+    "yo": {
+      "model": "",
+      "revision": ""
+    },
+    "en": {
+      "model": "",
+      "revision": ""
+    }
+  }
+}
