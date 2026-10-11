@@ -5,19 +5,19 @@
   },
   "asr": {
     "ha": {
-      "model": "",
+      "model": "NCAIR1/Hausa-ASR",
       "revision": ""
     },
     "ig": {
-      "model": "",
+      "model": "NCAIR1/Igbo-ASR",
       "revision": ""
     },
     "yo": {
-      "model": "",
+      "model": "NCAIR1/Yoruba-ASR",
       "revision": ""
     },
     "en": {
-      "model": "",
+      "model": "NCAIR1/NigerianAccentedEnglish",
       "revision": ""
     }
   }

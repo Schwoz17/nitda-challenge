@@ -4,11 +4,18 @@ import uuid
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 from config import LANGS
 from pipeline import Pipeline
 
 app = FastAPI(title="Magana pipeline")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.environ.get("MAGANA_ORIGINS", "*").split(","),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 _pipeline = None
 
 
