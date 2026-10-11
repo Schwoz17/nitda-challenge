@@ -6,19 +6,19 @@
   "asr": {
     "ha": {
       "model": "NCAIR1/Hausa-ASR",
-      "revision": ""
+      "revision": "e635b9eda29060c6114c8f4d8b2d903f5c83a44a"
     },
     "ig": {
       "model": "NCAIR1/Igbo-ASR",
-      "revision": ""
+      "revision": "180732299d5cba3dc8b289260ac84b7838bb3954"
     },
     "yo": {
       "model": "NCAIR1/Yoruba-ASR",
-      "revision": ""
+      "revision": "d1ae7b8b79c2ccd547d8761effe5057433f3fc7f"
     },
     "en": {
       "model": "NCAIR1/NigerianAccentedEnglish",
-      "revision": ""
+      "revision": "3c52c6e6c9ec508014a7b9db6a42b503b8930dff"
     }
   }
 }
