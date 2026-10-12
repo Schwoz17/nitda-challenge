@@ -132,3 +132,34 @@ def test_retries_use_a_higher_temperature_and_restore_it():
     p = Pipeline(llm, today=lambda: date(2026, 10, 11))
     assert p.turn("s", "en", text="debt tracker")["type"] == "spec"
     assert llm.temps == [0.1, 0.4, 0.7] and llm.temperature == 0.1
+
+
+
+def test_seeded_yes_stores_the_original_value_and_flags_the_miss():
+    p, _ = make([spec_reply(), record_reply()], seed_every=1)
+    p.turn("s", "en", text="debt tracker")
+    p.turn("s", "en", text="Mama Ngozi owes me fifteen thousand naira")
+    out = p.turn("s", "en", text="yes")
+    assert out["seeded_missed"] is True and out["record"]["amount_owed"] == 15000
+    import sqlite3
+    row = sqlite3.connect(store.DB_PATH).execute("select record, seeded from records").fetchone()
+    assert json.loads(row[0])["amount_owed"] == 15000 and row[1] == 1
+
+
+def test_no_asks_for_a_fresh_attempt_instead_of_rereading():
+    p, _ = make([spec_reply(), record_reply(), record_reply(20000)])
+    p.turn("s", "en", text="debt tracker")
+    p.turn("s", "en", text="Mama Ngozi owes me fifteen thousand naira")
+    out = p.turn("s", "en", text="no")
+    assert out["type"] == "speak" and "again" in out["text"]
+    assert p.sessions["s"].pending is None
+    nxt = p.turn("s", "en", text="Mama Ngozi owes me twenty thousand naira")
+    assert nxt["type"] == "readback" and "20,000" in nxt["text"]
+
+
+def test_responses_carry_what_was_heard_and_the_input_kind():
+    p, _ = make([spec_reply()])
+    out = p.turn("s", "en", text="debt tracker")
+    assert out["heard"] == "debt tracker"
+    log = (store.LOG_DIR / "s.jsonl").read_text(encoding="utf-8")
+    assert '"input": "typed"' in log

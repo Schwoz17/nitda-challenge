@@ -48,3 +48,12 @@ def transcribe(audio_path, lang):
     if not text:
         raise ASRError("empty transcript")
     return Transcript(text=text, lang=lang, model=model, revision=revision)
+
+def preload():
+    for entry in load_lock()["asr"].values():
+        if entry.get("model"):
+            _load(entry["model"], entry.get("revision", ""))
+
+
+def loaded():
+    return _load.cache_info().currsize > 0

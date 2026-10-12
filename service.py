@@ -1,6 +1,7 @@
 import os
 import tempfile
 import uuid
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -9,7 +10,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import LANGS
 from pipeline import Pipeline
 
-app = FastAPI(title="Magana pipeline")
+@asynccontextmanager
+async def lifespan(_):
+    if os.environ.get("MAGANA_PRELOAD") == "1":
+        from asr.client import preload
+        pipeline()
+        preload()
+    yield
+
+
+app = FastAPI(title="Magana pipeline", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.environ.get("MAGANA_ORIGINS", "*").split(","),
@@ -30,7 +40,8 @@ def pipeline():
 
 @app.get("/health")
 def health():
-    return {"ok": True}
+    from asr.client import loaded
+    return {"ok": True, "model_ready": _pipeline is not None, "asr_ready": loaded()}
 
 
 @app.post("/session")

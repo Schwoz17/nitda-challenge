@@ -20,6 +20,7 @@ class Session:
 
 class Pipeline:
     def __init__(self, llm, asr=transcribe, seed_every=0, today=date.today):
+        self.llm = llm
         self.engine = Engine(llm)
         self.asr = asr
         self.seed_every = seed_every
@@ -35,12 +36,15 @@ class Pipeline:
             log_event(sid, "asr_error", {"error": str(exc), "audio": str(audio)})
             return out
         norm = normalise(tr.text, lang)
+        info = getattr(self.llm, "info", None)
         trace = {
+            "input": "typed" if text is not None else "voice", "llm": info() if info else None,
             "lang": lang, "audio": str(audio) if audio else None,
             "asr_model": tr.model, "asr_revision": tr.revision, "transcript": tr.text,
             "normalised": norm.text, "amounts": [a.value for a in norm.amounts],
         }
         out = self._reply(sid, s, lang, tr, trace) if s.pending else self._request(sid, s, lang, norm, trace)
+        out["heard"] = tr.text
         log_event(sid, "turn", {**trace, "response": out})
         return out
 
@@ -109,11 +113,15 @@ class Pipeline:
             if p.kind == "edit":
                 s.spec = apply_edit(s.spec, p.spoken)
                 return {"type": "spec", "spec": s.spec}
-            commit(sid, lang, p.spoken, {"audio": trace["audio"], "transcript": trace["transcript"],
-                                         "readback": p.text, "reply": tr.text, "seeded": p.seeded})
-            return {"type": "saved", "record": p.spoken, "seeded_missed": p.seeded}
+            record = p.original if p.seeded else p.spoken
+            commit(sid, lang, record, {"audio": trace["audio"], "transcript": trace["transcript"],
+                                       "readback": p.text, "reply": tr.text, "seeded": p.seeded})
+            return {"type": "saved", "record": record, "seeded_missed": p.seeded}
         if out.kind == "tap":
             return {"type": "tap", "record": out.payload, "text": p.text}
+        if out.kind == "retry" and not p.seeded:
+            s.pending = None
+            return {"type": "speak", "text": rb.message("retry" if p.kind == "record" else "cancelled", lang)}
         caught = p.seeded and out.kind == "retry"
         if p.kind == "record":
             p.spoken, p.seeded = p.original, False

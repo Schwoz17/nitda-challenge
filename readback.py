@@ -28,6 +28,18 @@ MESSAGES = {
         "ig": "Aghọtaghị m. Biko, kwuo ya ọzọ.",
         "yo": "N kò gbọ́ yé mi. Jọ̀wọ́, tún sọ ọ́.",
     },
+    "retry": {
+        "en": "Okay, please say the entry again.",
+        "ha": "To, sake faɗar abin.",
+        "ig": "Ọ dị mma, biko kwuo ya ọzọ.",
+        "yo": "Ó dára, jọ̀wọ́ tún sọ ọ́.",
+    },
+    "cancelled": {
+        "en": "Okay, nothing was changed.",
+        "ha": "To, ba a canza komai ba.",
+        "ig": "Ọ dị mma, ọ dịghị ihe agbanweela.",
+        "yo": "Ó dára, kò sí ohun tí a yí padà.",
+    },
     "remove": {
         "en": "Remove {name}? Say yes or no.",
         "ha": "A cire {name}? Ka ce eh ko a'a.",

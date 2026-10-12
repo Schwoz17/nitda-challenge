@@ -3,3 +3,4 @@ __pycache__/
 logs/
 *.db
 .pytest_cache/
+eval/results/
